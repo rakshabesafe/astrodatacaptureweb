@@ -1,0 +1,2 @@
+User Prompt,Tool Name,Tool Args JSON,Intent Category
+"I'm deeply stuck in my current profession. When will my career graph finally start moving upward?",getAstrologicalVerdicts,{"domain": "CAREER"},TIMING

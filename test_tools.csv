@@ -1,0 +1,4 @@
+Tool Name,Description,Parameters Schema (JSON),Required Fields,Return Type
+getUserProfile,"Returns the user's stored demographic and biographical context",{},N/A,string
+getDivisionalChart,"Returns planet positions, degrees, and sign lord",{"chartType": {"type": "string", "description": "The target divisional chart designator (e.g., 'D1', 'D9', 'D10', 'D12')"}},chartType,string
+getAstrologicalVerdicts,"Gets astrological verdicts for a given domain",{"domain": {"type": "string"}},domain,string
