@@ -3,6 +3,10 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Tool } from '../db/db';
 import { Search, Upload, Plus, Edit2, Trash2, X, Save } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 export default function Tools() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,9 +29,51 @@ export default function Tools() {
     [searchTerm]
   );
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+        const pdf = await loadingTask.promise;
+        let fullText = '';
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = ((textContent.items as unknown) as { str: string }[]).map((item: { str: string }) => item.str).join(' ');
+          fullText += pageText + '\n';
+        }
+
+        // Parse the extracted text using XLSX
+        const wb = XLSX.read(fullText, { type: 'string' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
+
+        const toolsToAdd: Omit<Tool, 'id'>[] = ((data as unknown) as Record<string, string>[]).map((row: Record<string, string>) => ({
+          name: String(row['Tool Name'] || row.name || '') || '',
+          description: String(row['Description'] || row.description || '') || '',
+          parametersSchema: row['Parameters Schema (JSON)'] || row.parametersSchema || '{}',
+          requiredFields: row['Required Fields'] || row.requiredFields || '',
+          returnType: String(row['Return Type'] || row.returnType || '') || ''
+        })).filter(t => t.name);
+
+        if (toolsToAdd.length > 0) {
+          await db.tools.bulkAdd(toolsToAdd);
+          alert(`Successfully added ${toolsToAdd.length} tools.`);
+        } else {
+          alert('No valid tools found in the PDF.');
+        }
+      } catch (err) {
+        console.error('Error parsing PDF file:', err);
+        alert('Failed to parse the uploaded PDF file.');
+      }
+      e.target.value = '';
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = async (evt) => {
@@ -38,8 +84,8 @@ export default function Tools() {
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const toolsToAdd: Omit<Tool, 'id'>[] = data.map((row: any) => ({
+
+        const toolsToAdd: Omit<Tool, 'id'>[] = ((data as unknown) as Record<string, string>[]).map((row: Record<string, string>) => ({
           name: String(row['Tool Name'] || row.name || '') || '',
           description: String(row['Description'] || row.description || '') || '',
           parametersSchema: row['Parameters Schema (JSON)'] || row.parametersSchema || '{}',
@@ -127,8 +173,8 @@ export default function Tools() {
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <label className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-md shadow-sm hover:bg-slate-50 cursor-pointer transition-colors font-medium w-full sm:w-auto">
             <Upload className="w-4 h-4" />
-            Upload CSV/XLS
-            <input type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" className="hidden" onChange={handleFileUpload} />
+            Upload CSV/XLS/PDF
+            <input type="file" accept=".csv, .pdf, application/pdf, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" className="hidden" onChange={handleFileUpload} />
           </label>
           <button
             onClick={() => handleOpenModal()}
