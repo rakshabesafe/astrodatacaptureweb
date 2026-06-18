@@ -38,12 +38,13 @@ export default function Tools() {
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const toolsToAdd: Omit<Tool, 'id'>[] = data.map((row: any) => ({
-          name: row['Tool Name'] || row.name || '',
-          description: row['Description'] || row.description || '',
+          name: String(row['Tool Name'] || row.name || '') || '',
+          description: String(row['Description'] || row.description || '') || '',
           parametersSchema: row['Parameters Schema (JSON)'] || row.parametersSchema || '{}',
           requiredFields: row['Required Fields'] || row.requiredFields || '',
-          returnType: row['Return Type'] || row.returnType || ''
+          returnType: String(row['Return Type'] || row.returnType || '') || ''
         })).filter(t => t.name);
 
         if (toolsToAdd.length > 0) {
@@ -103,7 +104,7 @@ export default function Tools() {
     // basic JSON validation
     try {
       JSON.parse(formData.parametersSchema);
-    } catch(err) {
+    } catch {
       alert("Parameters Schema must be valid JSON.");
       return;
     }
@@ -118,20 +119,20 @@ export default function Tools() {
 
   return (
     <div className="flex flex-col gap-6 relative">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-semibold tracking-tight text-slate-900">Tool Management</h2>
           <p className="text-slate-500 mt-1">Manage external functions available for the LLM.</p>
         </div>
-        <div className="flex gap-3">
-          <label className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-md shadow-sm hover:bg-slate-50 cursor-pointer transition-colors font-medium">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <label className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-md shadow-sm hover:bg-slate-50 cursor-pointer transition-colors font-medium w-full sm:w-auto">
             <Upload className="w-4 h-4" />
             Upload CSV/XLS
             <input type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" className="hidden" onChange={handleFileUpload} />
           </label>
           <button
             onClick={() => handleOpenModal()}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 transition-colors font-medium"
+            className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 transition-colors font-medium w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             Add New Tool
@@ -141,7 +142,7 @@ export default function Tools() {
 
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden flex flex-col">
         <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
-          <div className="relative w-96">
+          <div className="relative w-full sm:w-96">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
