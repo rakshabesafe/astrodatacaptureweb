@@ -13,12 +13,12 @@ export default function Export() {
 
       const toolsMap = allTools.reduce((acc, t) => {
         let params = {};
-        try { params = JSON.parse(t.parametersSchema); } catch (e) {}
+        try { params = JSON.parse(t.parametersSchema); } catch { /* ignore */ }
 
         let required: string[] = [];
         if (t.requiredFields && t.requiredFields !== 'N/A') {
           if (t.requiredFields.startsWith('[')) {
-            try { required = JSON.parse(t.requiredFields); } catch(e) {}
+            try { required = JSON.parse(t.requiredFields); } catch { /* ignore */ }
           } else {
             required = t.requiredFields.split(',').map(s => s.trim());
           }
@@ -36,11 +36,12 @@ export default function Export() {
           }
         };
         return acc;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }, {} as any);
 
       const dataset = allMappings.map(m => {
         let args = {};
-        try { args = JSON.parse(m.toolArgs); } catch (e) {}
+        try { args = JSON.parse(m.toolArgs); } catch { /* ignore */ }
 
         // Gather all tools involved (in a real scenario, you might want all available tools per row,
         // but here we just include the one it maps to, or a subset. We'll include all tools for simplicity,
@@ -98,15 +99,15 @@ export default function Export() {
 
   return (
     <div className="flex flex-col gap-6 max-h-[calc(100vh-4rem)]">
-      <div className="flex justify-between items-center shrink-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center shrink-0 gap-4">
         <div>
           <h2 className="text-3xl font-semibold tracking-tight text-slate-900">Export Dataset</h2>
           <p className="text-slate-500 mt-1">Review and download your formatted JSONL/JSON dataset for training.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-md shadow-sm hover:bg-slate-50 transition-colors font-medium"
+            className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-md shadow-sm hover:bg-slate-50 transition-colors font-medium w-full sm:w-auto"
           >
             {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
             {copied ? 'Copied!' : 'Copy to Clipboard'}
@@ -114,7 +115,7 @@ export default function Export() {
           <button
             onClick={handleDownload}
             disabled={!jsonStr || jsonStr === '[]'}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium w-full sm:w-auto"
           >
             <Download className="w-4 h-4" />
             Download JSON
