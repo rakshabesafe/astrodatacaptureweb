@@ -1,4 +1,5 @@
 Tool Name,Description,Parameters Schema (JSON),Required Fields,Return Type
-getUserProfile,"Returns the user's stored demographic and biographical context",{},N/A,string
-getDivisionalChart,"Returns planet positions, degrees, and sign lord",{"chartType": {"type": "string", "description": "The target divisional chart designator (e.g., 'D1', 'D9', 'D10', 'D12')"}},chartType,string
-getAstrologicalVerdicts,"Gets astrological verdicts for a given domain",{"domain": {"type": "string"}},domain,string
+getUserProfile,Returns the user's stored demographic and biographical context,{},N/A,string
+getDivisionalChart,"Returns planet positions, degrees, and sign lord","{""chartType"": {""type"": ""string"", ""description"": ""The target divisional chart designator (e.g., 'D1', 'D9', 'D10', 'D12')""}}",chartType,string
+getAstrologicalVerdicts,Gets astrological verdicts for a given domain,"{""domain"": {""type"": ""string""}}",domain,string
+getCompatibilityAnalysis,"Runs marriage compatibility analysis. Takes date of birth, time, and location of birth of bride and groom. Keeps guna milan point calculation as is. Also does mangalik dosha check and further analysis beyond points as highlighted in https://soulnakshatra.com/kundali-matching-beyond-points/ and https://www.vedaz.io/blogs/compatibility-beyond-kundli-matching.","{""brideDob"": {""type"": ""string"", ""description"": ""YYYY-MM-DD""}, ""brideTob"": {""type"": ""string"", ""description"": ""HH:MM""}, ""brideLob"": {""type"": ""string""}, ""groomDob"": {""type"": ""string"", ""description"": ""YYYY-MM-DD""}, ""groomTob"": {""type"": ""string"", ""description"": ""HH:MM""}, ""groomLob"": {""type"": ""string""}}","brideDob,brideTob,brideLob,groomDob,groomTob,groomLob",string

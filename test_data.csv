@@ -1,2 +1,4 @@
 User Prompt,Tool Name,Tool Args JSON,Intent Category
-"I'm deeply stuck in my current profession. When will my career graph finally start moving upward?",getAstrologicalVerdicts,{"domain": "CAREER"},TIMING
+I'm deeply stuck in my current profession. When will my career graph finally start moving upward?,getAstrologicalVerdicts,"{""domain"": ""CAREER""}",TIMING
+"is this person compatible with me? their details are 1995-08-15 10:30 New York, and mine are 1994-06-20 14:15 London.",getCompatibilityAnalysis,"{""brideDob"": ""1994-06-20"", ""brideTob"": ""14:15"", ""brideLob"": ""London"", ""groomDob"": ""1995-08-15"", ""groomTob"": ""10:30"", ""groomLob"": ""New York""}",COMPATIBILITY
+"I want to check marriage compatibility. The bride was born on 1990-01-01 at 12:00 in Delhi, and the groom was born on 1989-05-05 at 14:00 in Mumbai. Can you run the analysis?",getCompatibilityAnalysis,"{""brideDob"": ""1990-01-01"", ""brideTob"": ""12:00"", ""brideLob"": ""Delhi"", ""groomDob"": ""1989-05-05"", ""groomTob"": ""14:00"", ""groomLob"": ""Mumbai""}",COMPATIBILITY
